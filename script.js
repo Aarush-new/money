@@ -1,12 +1,34 @@
+// Initialize Firebase
+var firebaseConfig = {
+  apiKey: "AIzaSyDqnZKeeWb_5gI9EJPx1ycT3SRiLKN6H-Y",
+  authDomain: "money-cd0d1.firebaseapp.com",
+  projectId: "money-cd0d1",
+  storageBucket: "money-cd0d1.appspot.com",
+  messagingSenderId: "19888883860",
+  appId: "1:19888883860:web:b2e14c1068acf60ddb8c81",
+  measurementId: "G-B12S2KWYQG"
+};
+
+firebase.initializeApp(firebaseConfig);
+
+// Get a reference to the Firebase Realtime Database
+var database = firebase.database();
+
 // Get elements
 const balanceElement = document.getElementById('balance');
 const amountInput = document.getElementById('amount');
 const transactionList = document.getElementById('transactions');
-const customPrompt = document.getElementById('customPrompt');
-const promptCountElement = document.getElementById('promptCount');
 
-let balance = localStorage.getItem('balance') ? parseFloat(localStorage.getItem('balance')) : 0.00;
-let transactionHistory = localStorage.getItem('transactions') ? JSON.parse(localStorage.getItem('transactions')) : [];
+// Fetch data from Firebase on page load
+database.ref('balance').once('value', function(snapshot) {
+  balance = snapshot.val() || 0.00;
+  updateDisplay();
+});
+
+database.ref('transactions').once('value', function(snapshot) {
+  transactionHistory = snapshot.val() || [];
+  updateDisplay();
+});
 
 // Update balance and transaction history display
 function updateDisplay() {
@@ -38,9 +60,9 @@ function debit() {
   amountInput.value = '';
   document.getElementById('description').value = '';
 
-  // Save data to localStorage
-  localStorage.setItem('balance', balance);
-  localStorage.setItem('transactions', JSON.stringify(transactionHistory));
+  // Save data to Firebase
+  database.ref('balance').set(balance);
+  database.ref('transactions').set(transactionHistory);
 }
 
 // Credit money
@@ -58,30 +80,20 @@ function credit() {
   amountInput.value = '';
   document.getElementById('description').value = '';
 
-  // Save data to localStorage
-  localStorage.setItem('balance', balance);
-  localStorage.setItem('transactions', JSON.stringify(transactionHistory));
+  // Save data to Firebase
+  database.ref('balance').set(balance);
+  database.ref('transactions').set(transactionHistory);
 }
 
-// Custom Prompt functions
-let promptCount = 3;
+// Clear data
+function clearData() {
+  balance = 0.00;
+  transactionHistory = [];
+  updateDisplay();
 
-function showCustomPrompt() {
-  customPrompt.style.display = 'flex';
-}
-
-function hideCustomPrompt() {
-  customPrompt.style.display = 'none';
-}
-
-function confirmClearData() {
-  promptCount--;
-  if (promptCount === 0) {
-    localStorage.clear();
-    location.reload(); // Refresh the page after clearing data
-  } else {
-    promptCountElement.textContent = promptCount;
-  }
+  // Save data to Firebase
+  database.ref('balance').set(balance);
+  database.ref('transactions').set(transactionHistory);
 }
 
 // Initialize display
