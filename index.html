@@ -15,15 +15,16 @@
     <div class="button-container">
       <button onclick="debit()" class="button-green">Take Away</button>
       <button onclick="credit()" class="button-green">Give Away</button>
+
     </div>
     <h2>Transaction History</h2>
     <ul id="transactions"></ul>
-    <button onclick="showCustomPrompt()" class="button-clear">Clear Data</button>
+      <button onclick="clearData()" class="button-clear">Clear Data</button>
     <div id="customPrompt">
       <div id="promptContent">
         <p>Are you sure? <span id="promptCount">3</span></p>
         <button onclick="confirmClearData()" class="button-red">Yes</button>
-        <button onclick="hideCustomPrompt()" class="button-green">Cancel</button>
+        <button onclick="hidePrompt()" class="button-green">Cancel</button>
       </div>
     </div>
   </div>
