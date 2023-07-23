@@ -31,7 +31,8 @@ database.ref('balance').once('value', function(snapshot) {
 });
 
 database.ref('transactions').once('value', function(snapshot) {
-  transactionHistory = snapshot.val() || [];
+  const transactionsData = snapshot.val();
+  transactionHistory = transactionsData ? Object.values(transactionsData) : [];
   updateDisplay();
 });
 
@@ -40,12 +41,19 @@ function updateDisplay() {
   balanceElement.textContent = `Balance: ₹${balance.toFixed(2)}`;
 
   transactionList.innerHTML = '';
-  for (let i = transactionHistory.length - 1; i >= 0; i--) {
-    const transaction = transactionHistory[i];
+
+  if (Array.isArray(transactionHistory)) {
+    for (let i = transactionHistory.length - 1; i >= 0; i--) {
+      const transaction = transactionHistory[i];
+      const listItem = document.createElement('li');
+      const type = transaction.type === 'debit' ? 'Take Away' : 'Give Away';
+      listItem.textContent = `${type}: ₹${transaction.amount.toFixed(2)} - ${transaction.description}`;
+      listItem.classList.add(transaction.type);
+      transactionList.appendChild(listItem);
+    }
+  } else {
     const listItem = document.createElement('li');
-    const type = transaction.type === 'debit' ? 'Take Away' : 'Give Away';
-    listItem.textContent = `${type}: ₹${transaction.amount.toFixed(2)} - ${transaction.description}`;
-    listItem.classList.add(transaction.type);
+    listItem.textContent = 'No transactions yet';
     transactionList.appendChild(listItem);
   }
 }
